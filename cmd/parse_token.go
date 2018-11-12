@@ -35,7 +35,7 @@ func parse(cmd *cobra.Command, args []string) {
 	log.Debug("parsing token...")
 	// connect to autgh service on http://192.168.99.100:31000/api/token/keys
 	c := &http.Client{Timeout: 10 * time.Second}
-	keysEndpoint := "http://192.168.99.100:31000/api/token/keys"
+	keysEndpoint := "https://auth.prod-preview.openshift.io/api/token/keys"
 	res, err := c.Get(keysEndpoint)
 	if err != nil {
 		log.Errorf("failed to retrieve the keys on '%s': %v", keysEndpoint, err)
