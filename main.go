@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fabric8-services/fabric8-auth-login/cmd"
+	"github.com/fabric8-services/fabric8-auth-cli/cmd"
 )
 
 func main() {

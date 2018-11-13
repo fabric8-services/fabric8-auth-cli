@@ -7,13 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var helpTemplate = `
-{{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}`
-
 func newHelpCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:               "help [command]",
-		Short:             "Help about the command",
+		Short:             "help about the command",
 		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
 		RunE: func(c *cobra.Command, args []string) error {

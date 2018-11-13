@@ -20,45 +20,58 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+var target string
+var username string
+
+const (
+	previewURL    string = "https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F"
+	productionURL string = "https://auth.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fopenshift.io%252F"
+)
+
 // NewLoginCommand a command to login on `fabtic8-auth` service
 func newLoginCommand() *cobra.Command {
-	c := &cobra.Command{
-		Short: "login",
+	cmdLogin := &cobra.Command{
+		Short: "obtain an access token and a refresh token for preview or production platforms",
 		Use:   "login",
-		// Args:  cobra.MinimumNArgs(1),
-		Run: login,
+		Run:   login,
 	}
-
-	return c
+	cmdLogin.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production'")
+	cmdLogin.Flags().StringVarP(&username, "username", "u", "", "your username")
+	return cmdLogin
 }
 
 func login(cmd *cobra.Command, args []string) {
-	// login
-	// redirects to https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F
-	// redirects to https://auth.prod-preview.openshift.io/api/login?redirect=https%3A%2F%2Fprod-preview.openshift.io%2F
-	// redirects to https://sso.prod-preview.openshift.io/auth/realms/fabric8/protocol/openid-connect/auth?access_type=online&client_id=fabric8-online-platform&redirect_uri=https%3A%2F%2Fauth.prod-preview.openshift.io%2Fapi%2Flogin&response_type=code&scope=user%3Aemail&state=... with custom state and cookie
-	// see other: https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/rhd/login?code=y...&client_id=fabric8-online-platform with `AUTH_SESSION_ID` cookie
-	// see other https://developers.redhat.com/auth/realms/rhd/protocol/openid-connect/auth?scope=openid&state=...&response_type=code&client_id=fabric8-online&redirect_uri=https%3A%2F%2Fsso.prod-preview.openshift.io%2Fauth%2Frealms%2Ffabric8%2Fbroker%2Frhd%2Fendpoint
-
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
 		log.Fatal(err)
 	}
-	action, method, err := retrieveLoginActionURL("https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F", jar)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// prompt for username and password
-	fmt.Print("username: ")
-	scanner := bufio.NewScanner(os.Stdin)
-	var username string
-	if scanner.Scan() {
-		username = strings.TrimRight(scanner.Text(), "\r\n")
+	if username == "" {
+		// prompt for username and password
+		fmt.Print("username: ")
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			username = strings.TrimRight(scanner.Text(), "\r\n")
+		}
 	}
 	fmt.Print("password: ")
 	password, err := terminal.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	var targetURL string
+	switch target {
+	case "production":
+		targetURL = productionURL
+	default:
+		targetURL = previewURL
+
+	}
 	// submit login form
 	fmt.Println("\nperforming login, please wait... 😴")
+	action, method, err := retrieveLoginActionURL(targetURL, jar)
+	if err != nil {
+		log.Fatal(err)
+	}
 	landingURL, err := performLogin(action, method, username, password, jar)
 	if err != nil {
 		log.Fatal(err)
