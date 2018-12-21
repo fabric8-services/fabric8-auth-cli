@@ -30,24 +30,6 @@
   unused-packages = true
 
 [[constraint]]
-  name = "github.com/pkg/errors"
-  version = "0.8.0"
-
-[[constraint]]
-  name = "github.com/sirupsen/logrus"
-  source = "https://github.com/sirupsen/logrus.git"
-  version = "1.0.0"
-
-[[constraint]]
-  name = "github.com/stretchr/testify"
-  version = "1.1.3"
-
-[[constraint]]
-  name = "github.com/spf13/cobra"
-  version = "0.0.2"
-
-[[constraint]]
-  name = "github.com/chzyer/readline"
-  version = "1.4.0"
-
+  name = "github.com/fabric8-services/fabric8-common"
+  revision = "2efd83d29b1e5c657728e83fe03878569c0f122f"
   

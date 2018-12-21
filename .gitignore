@@ -73,3 +73,5 @@ tmp/
 # dep package manager
 vendor/
 
+
+dist

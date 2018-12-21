@@ -24,20 +24,20 @@ var target string
 var username string
 
 const (
-	previewURL    string = "https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F"
-	productionURL string = "https://auth.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fopenshift.io%252F"
+	previewLoginURL    string = "https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F"
+	productionLoginURL string = "https://auth.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fopenshift.io%252F"
 )
 
-// NewLoginCommand a command to login on `fabtic8-auth` service
+// NewLoginCommand a command to login on `fabric8-auth` service
 func newLoginCommand() *cobra.Command {
-	cmdLogin := &cobra.Command{
+	loginCmd := &cobra.Command{
 		Short: "obtain an access token and a refresh token for preview or production platforms",
 		Use:   "login",
 		Run:   login,
 	}
-	cmdLogin.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production'")
-	cmdLogin.Flags().StringVarP(&username, "username", "u", "", "your username")
-	return cmdLogin
+	loginCmd.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production'")
+	loginCmd.Flags().StringVarP(&username, "username", "u", "", "your username")
+	return loginCmd
 }
 
 func login(cmd *cobra.Command, args []string) {
@@ -61,9 +61,9 @@ func login(cmd *cobra.Command, args []string) {
 	var targetURL string
 	switch target {
 	case "production":
-		targetURL = productionURL
+		targetURL = productionLoginURL
 	default:
-		targetURL = previewURL
+		targetURL = previewLoginURL
 
 	}
 	// submit login form

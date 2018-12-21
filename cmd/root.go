@@ -20,6 +20,7 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.SetHelpCommand(helpCommand)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose")
 	rootCmd.AddCommand(newLoginCommand())
+	rootCmd.AddCommand(newDescribeCommand())
 	rootCmd.AddCommand(newAboutCommand())
 	return rootCmd
 }
