@@ -16,12 +16,15 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	keyring "github.com/zalando/go-keyring"
 	"golang.org/x/net/html"
 	"golang.org/x/net/publicsuffix"
 )
 
 var target string
 var username string
+var keyringUser string
+var keyringService string
 
 const (
 	previewLoginURL    string = "https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F"
@@ -37,6 +40,9 @@ func newLoginCommand() *cobra.Command {
 	}
 	loginCmd.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production'")
 	loginCmd.Flags().StringVarP(&username, "username", "u", "", "your username")
+
+	loginCmd.Flags().StringVarP(&keyringUser, "keyring-user", "", "", "Keyring user")
+	loginCmd.Flags().StringVarP(&keyringService, "keyring-service", "", "", "Keyring service")
 	return loginCmd
 }
 
@@ -53,10 +59,17 @@ func login(cmd *cobra.Command, args []string) {
 			username = strings.TrimRight(scanner.Text(), "\r\n")
 		}
 	}
-	fmt.Print("password: ")
-	password, err := terminal.ReadPassword(int(os.Stdin.Fd()))
-	if err != nil {
-		log.Fatal(err)
+
+	// try to get password from keyring, it's okay if we can't find it (i.e: ignore error)
+	password, _ := keyring.Get(keyringUser, keyringService)
+
+	if password == "" {
+		fmt.Print("password: ")
+		b, err := terminal.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			log.Fatal(err)
+		}
+		password = string(b)
 	}
 	var targetURL string
 	switch target {
@@ -133,7 +146,7 @@ func (t *traceTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 // performLogin performs the login and returns the landing URL
-func performLogin(loginURL, method, username string, password []byte, jar *cookiejar.Jar) (*url.URL, error) {
+func performLogin(loginURL, method, username, password string, jar *cookiejar.Jar) (*url.URL, error) {
 	t := newTraceTransport()
 	client := &http.Client{
 		Jar:       jar,
@@ -141,7 +154,7 @@ func performLogin(loginURL, method, username string, password []byte, jar *cooki
 	}
 	form := url.Values{}
 	form.Add("username", username)
-	form.Add("password", string(password))
+	form.Add("password", password)
 	form.Add("login", "Log in")
 	req, err := http.NewRequest(strings.ToUpper(method), loginURL, strings.NewReader(form.Encode()))
 	if err != nil {
