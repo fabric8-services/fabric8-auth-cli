@@ -32,4 +32,8 @@
 [[constraint]]
   name = "github.com/fabric8-services/fabric8-common"
   revision = "2efd83d29b1e5c657728e83fe03878569c0f122f"
-  
+
+[[constraint]]
+  name = "github.com/fabric8-services/fabric8-auth-cli"
+  branch = "master"
+  source = "github.com/xcoulon/fabric8-auth-cli"

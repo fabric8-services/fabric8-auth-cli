@@ -33,6 +33,13 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/fabric8-services/fabric8-auth-cli"
+  packages = ["cmd"]
+  revision = "018e066db6ad8784a43cfc11dd7dc7e48caf9934"
+  source = "github.com/xcoulon/fabric8-auth-cli"
+
+[[projects]]
+  branch = "master"
   name = "github.com/fabric8-services/fabric8-auth-client"
   packages = ["auth"]
   revision = "5e9eda695396296c02614e0ccb964404d4af08e6"
@@ -201,6 +208,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7e716c4f1f17d15a0b254c741b6ba385d989156e90a1e7014f9477886bb5228a"
+  inputs-digest = "c8998dda6c6f7d7b0f4fd29399ebe800bc24a6ba817b7658d7253c3e9254bdba"
   solver-name = "gps-cdcl"
   solver-version = 1
