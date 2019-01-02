@@ -15,15 +15,24 @@ make install
 osio login --help
 ```
 
-On macOS, you can register a password for a service/account pair which can be used with the `osio` command so you don't need to input your OpenShift.io account's password each time:
+=== Keyring support
+
+On Linux and macOS, you can register a password for a service/account pair which can be used with the `osio` command so you don't need to input your OpenShift.io account's password each time.
+
+On Linux, you can follow the instructions on https://github.com/zalando/go-keyring#linux[the go-keyring docs].
+
+On macOS, you can use the `security` command as follows:
 
 ```
 security add-generic-password -a <username> -s <service_name> -w <password>
-osio login -t preview --keyring-user <username> --keyring-service <service_name>
 ```
 
 TIP:: if the `security add-generic-password` command is prefixed with a space, it won't be recorded in the terminal session history.
 
+Once done, you can use the account and service as arguments in the `osio login` command:
+```
+osio login -t preview --keyring-user <username> --keyring-service <service_name>
+```
 
 You can even directly export the access token to an environment variable for later re-use with a `curl` command, for example:
 
