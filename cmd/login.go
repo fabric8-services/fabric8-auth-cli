@@ -25,6 +25,7 @@ var target string
 var username string
 var keyringUser string
 var keyringService string
+var accessTokenOnly bool
 
 const (
 	previewLoginURL    string = "https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F"
@@ -39,8 +40,8 @@ func newLoginCommand() *cobra.Command {
 		Run:   login,
 	}
 	loginCmd.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production'")
-	loginCmd.Flags().StringVarP(&username, "username", "u", "", "your username")
-
+	loginCmd.Flags().StringVarP(&username, "username", "u", "", "your username (optional. Will use the keyring-user if missing)")
+	loginCmd.Flags().BoolVarP(&accessTokenOnly, "access-token-only", "a", true, "return access token only")
 	loginCmd.Flags().StringVarP(&keyringUser, "keyring-user", "", "", "Keyring user")
 	loginCmd.Flags().StringVarP(&keyringService, "keyring-service", "", "", "Keyring service")
 	return loginCmd
@@ -57,7 +58,10 @@ func login(cmd *cobra.Command, args []string) {
 		username = keyringUser
 	}
 
-	if username == "" {
+	// if the username is empty but the keyring account has been provided, then use it as-is
+	if username == "" && keyringUser != "" {
+		username = keyringUser
+	} else if username == "" {
 		// prompt for username and password
 		fmt.Print("username: ")
 		scanner := bufio.NewScanner(os.Stdin)
@@ -86,7 +90,9 @@ func login(cmd *cobra.Command, args []string) {
 
 	}
 	// submit login form
-	fmt.Println("\nperforming login, please wait... 😴")
+	if verbose {
+		fmt.Println("\nperforming login, please wait... 😴")
+	}
 	action, method, err := retrieveLoginActionURL(targetURL, jar)
 	if err != nil {
 		log.Fatal(err)
@@ -95,7 +101,6 @@ func login(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Debugf("landed on %s", landingURL)
 	// now, extract the `token_json` query param from the landing page URL
 	if tokenJSON, ok := landingURL.Query()["token_json"]; ok {
 		if len(tokenJSON) == 0 {
@@ -107,8 +112,12 @@ func login(cmd *cobra.Command, args []string) {
 		if err != nil {
 			log.Fatalf("failed to parse the tokens retrieved upon login: %v", err)
 		}
-		fmt.Printf("access token: %s\n\n", tokens.AccessToken)
-		fmt.Printf("refresh token: %s\n\n", tokens.RefreshToken)
+		if accessTokenOnly {
+			fmt.Printf(tokens.AccessToken)
+		} else {
+			fmt.Printf("access token: %s\n\n", tokens.AccessToken)
+			fmt.Printf("refresh token: %s\n\n", tokens.RefreshToken)
+		}
 	} else {
 		log.Fatalf("the landing URL did not contain a 'token_json' query param: %s", landingURL.String())
 

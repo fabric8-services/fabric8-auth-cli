@@ -1,0 +1,38 @@
+= Fabric8-auth-cli
+
+`fabric8-auth-cli` provides a tool to retrieve an access token and optionally a refresh token from the CLI, by performing authentication on the preview or production platform and using the user's credentials which can be provided either from the terminal prompt, or using a keyring interface (using the https://github.com/zalando/go-keyring[go-keyring] library).
+
+== How to install
+
+```
+git clone https://github.com/fabric8-services/fabric8-auth-cli.git
+make install
+```
+
+== How to use it
+
+```
+osio login --help
+```
+
+On macOS, you can register a password for a service/account pair which can be used with the `osio` command so you don't need to input your OpenShift.io account's password each time:
+
+```
+security add-generic-password -a <username> -s <service_name> -w <password>
+osio login -t preview --keyring-user <username> --keyring-service <service_name>
+```
+
+TIP:: if the `security add-generic-password` command is prefixed with a space, it won't be recorded in the terminal session history.
+
+
+You can even directly export the access token to an environment variable for later re-use with a `curl` command, for example:
+
+```
+export PREVIEW_TOKEN=`osio login -t preview --keyring-user <username> --keyring-service <service_name>`
+curl -H "Authorization: Bearer $PREVIEW_TOKEN" https://auth.prod-preview.openshift.io/api/user -s | jq
+```
+
+
+== License
+
+This library is available under the link:LICENSE[Apache License Version 2.0].
