@@ -51,6 +51,12 @@ func login(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// If keyringUser is specified but not username then let's have the username as the keyringUser
+	if keyringUser != "" && username == "" {
+		username = keyringUser
+	}
+
 	if username == "" {
 		// prompt for username and password
 		fmt.Print("username: ")
