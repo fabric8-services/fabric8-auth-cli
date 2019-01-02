@@ -61,7 +61,7 @@ func login(cmd *cobra.Command, args []string) {
 	}
 
 	// try to get password from keyring, it's okay if we can't find it (i.e: ignore error)
-	password, _ := keyring.Get(keyringUser, keyringService)
+	password, _ := keyring.Get(keyringService, keyringUser)
 
 	if password == "" {
 		fmt.Print("password: ")
