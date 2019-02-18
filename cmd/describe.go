@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/fabric8-services/fabric8-common/auth"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -18,7 +20,7 @@ func newDescribeCommand() *cobra.Command {
 		Run:   describe,
 		Args:  cobra.ExactArgs(1),
 	}
-	describeCmd.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production', to retrieve the public key to verify the signature")
+	describeCmd.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production', required to retrieve the public key to verify the signature")
 	return describeCmd
 }
 
@@ -44,6 +46,15 @@ func describe(cmd *cobra.Command, args []string) {
 	t, err := tokenManager.Parse(context.Background(), args[0])
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to parse token")
+	}
+	if claims, ok := t.Claims.(jwt.MapClaims); ok {
+		if iat, ok := claims["iat"]; ok {
+			claims["iat"] = time.Unix(int64(iat.(float64)), 0)
+		}
+		if exp, ok := claims["exp"]; ok {
+			claims["exp"] = time.Unix(int64(exp.(float64)), 0)
+		}
+
 	}
 	b, err := json.MarshalIndent(t.Claims, "", "  ")
 	if err == nil {
