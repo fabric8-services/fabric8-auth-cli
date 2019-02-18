@@ -25,7 +25,7 @@ var target string
 var username string
 var keyringUser string
 var keyringService string
-var accessTokenOnly bool
+var allTokens bool
 
 const (
 	previewLoginURL    string = "https://auth.prod-preview.openshift.io/api/logout?redirect=https%3A%2F%2Fapi.prod-preview.openshift.io%2Fapi%2Flogin%2Fauthorize%3Fredirect%3Dhttps%253A%252F%252Fprod-preview.openshift.io%252F"
@@ -41,7 +41,7 @@ func newLoginCommand() *cobra.Command {
 	}
 	loginCmd.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production'")
 	loginCmd.Flags().StringVarP(&username, "username", "u", "", "your username (optional. Will use the keyring-user if missing)")
-	loginCmd.Flags().BoolVarP(&accessTokenOnly, "access-token-only", "a", true, "return access token only")
+	loginCmd.Flags().BoolVarP(&allTokens, "all-tokens", "a", true, "return refresh token and access token")
 	loginCmd.Flags().StringVarP(&keyringUser, "keyring-user", "", "", "Keyring user")
 	loginCmd.Flags().StringVarP(&keyringService, "keyring-service", "", "", "Keyring service")
 	return loginCmd
@@ -112,11 +112,13 @@ func login(cmd *cobra.Command, args []string) {
 		if err != nil {
 			log.Fatalf("failed to parse the tokens retrieved upon login: %v", err)
 		}
-		if accessTokenOnly {
-			fmt.Printf(tokens.AccessToken)
+		if allTokens {
+			fmt.Printf(`{
+	"access-token": "%s",
+	"refresh-token": "%s"
+}`, tokens.AccessToken, tokens.RefreshToken)
 		} else {
-			fmt.Printf("access token: %s\n\n", tokens.AccessToken)
-			fmt.Printf("refresh token: %s\n\n", tokens.RefreshToken)
+			fmt.Printf(tokens.AccessToken)
 		}
 	} else {
 		log.Fatalf("the landing URL did not contain a 'token_json' query param: %s", landingURL.String())
