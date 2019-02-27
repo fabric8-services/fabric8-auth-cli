@@ -41,7 +41,7 @@ func newLoginCommand() *cobra.Command {
 	}
 	loginCmd.Flags().StringVarP(&target, "target", "t", "preview", "the target platform to log in: 'preview' or 'production'")
 	loginCmd.Flags().StringVarP(&username, "username", "u", "", "your username (optional. Will use the keyring-user if missing)")
-	loginCmd.Flags().BoolVarP(&allTokens, "all-tokens", "a", true, "return refresh token and access token")
+	loginCmd.Flags().BoolVarP(&allTokens, "all-tokens", "a", false, "return refresh token and access token (default: 'false', i.e., only return the access token)")
 	loginCmd.Flags().StringVarP(&keyringUser, "keyring-user", "", "", "Keyring user")
 	loginCmd.Flags().StringVarP(&keyringService, "keyring-service", "", "", "Keyring service")
 	return loginCmd
