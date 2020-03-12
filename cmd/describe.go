@@ -38,6 +38,7 @@ func describe(cmd *cobra.Command, args []string) {
 	default:
 		targetURL = previewKeysURL
 	}
+	fmt.Printf("loading keys on %s\n", targetURL)
 	config := getConfig(targetURL)
 	tokenManager, err := auth.DefaultManager(config)
 	if err != nil {

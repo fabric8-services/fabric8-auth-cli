@@ -101,6 +101,9 @@ func login(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if verbose {
+		fmt.Printf("Landing URL:\n%s\n\n", landingURL)
+	}
 	// now, extract the `token_json` query param from the landing page URL
 	if tokenJSON, ok := landingURL.Query()["token_json"]; ok {
 		if len(tokenJSON) == 0 {
@@ -178,9 +181,16 @@ func performLogin(loginURL, method, username, password string, jar *cookiejar.Ja
 		return nil, errors.Wrap(err, "failed to perform HTTP request")
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	_, err = client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to perform HTTP request")
+	}
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to read response body when server responded with '%s'", resp.Status)
+		}
+		return nil, errors.Errorf("error occurred: %s", string(body))
 	}
 	return t.currentLocation, nil
 
@@ -204,7 +214,9 @@ func retrieveLoginActionURL(loginURL string, jar *cookiejar.Jar) (string, string
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to retrieve the HTML login page")
 	}
-	// fmt.Println(string(body))
+	if verbose {
+		fmt.Printf("Login page:\n%s\n\n", string(body))
+	}
 	doc, err := html.Parse(strings.NewReader(string(body)))
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to parse the HTML login page")
