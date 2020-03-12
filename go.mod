@@ -34,4 +34,4 @@ require (
 // file are not on GitHub, so the import of the module fails. The workaround here is to
 // use a local repo in which the test were run, so the code compiles.
 // This local repo also needs go modules support
-replace github.com/fabric8-services/fabric8-common => ../fabric8-common
+replace github.com/fabric8-services/fabric8-common => github.com/xcoulon/fabric8-common v0.0.0-20200312131248-f58c6dd3cd8c

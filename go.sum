@@ -148,6 +148,8 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/wadey/gocovmerge v0.0.0-20160331181800-b5bfa59ec0ad/go.mod h1:Hy8o65+MXnS6EwGElrSRjUzQDLXreJlzYLlWiHtt8hM=
+github.com/xcoulon/fabric8-common v0.0.0-20200312131248-f58c6dd3cd8c h1:VOo4PXg4x7W3n0HbnWJqqrUT0BsVqlnqtIkzTRwqojs=
+github.com/xcoulon/fabric8-common v0.0.0-20200312131248-f58c6dd3cd8c/go.mod h1:I2u9HZuuuBQuo+LdZUitTbIUjPH1wwj2VPza8S1qvFk=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea/go.mod h1:eNr558nEUjP8acGw8FFjTeWvSgU1stO7FAO6eknhHe4=
 github.com/zalando/go-keyring v0.0.0-20180221093347-6d81c293b3fb h1:tXbazu9ZlecQbyCczvA22mWj+lw/36Bdwxapk8v7e7s=
